@@ -7,15 +7,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download Godot 4.7
+      - name: Download Godot
         run: |
-          wget https://github.com/godotengine/godot/releases/download/4.7-stable/Godot_v4.7-stable_linux.x86_64.zip
-          unzip Godot_v4.7-stable_linux.x86_64.zip
-          mv Godot_v4.7-stable_linux.x86_64 godot
+          wget https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip
+          unzip Godot_v4.3-stable_linux.x86_64.zip
+          mv Godot_v4.3-stable_linux.x86_64 godot
 
-          wget https://github.com/godotengine/godot/releases/download/4.7-stable/Godot_v4.7-stable_export_templates.tpz
-          mkdir -p ~/.local/share/godot/export_templates/4.7.stable
-          unzip Godot_v4.7-stable_export_templates.tpz -d ~/.local/share/godot/export_templates/4.7.stable/
+          wget https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_export_templates.tpz
+          mkdir -p ~/.local/share/godot/export_templates/4.3.stable
+          unzip Godot_v4.3-stable_export_templates.tpz -d ~/.local/share/godot/export_templates/4.3.stable/
 
       - name: Export Game
         run: |
