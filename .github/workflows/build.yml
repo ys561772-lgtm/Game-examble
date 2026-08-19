@@ -25,7 +25,7 @@ jobs:
           mkdir -p ~/.local/share/godot/export_templates/4.3.stable
           unzip -q templates.tpz -d ~/.local/share/godot/export_templates/4.3.stable/
 
-      - name: Find Project and Export
+      - name: Find Project and Export APK
         run: |
           PROJECT_FILE=$(find . -name "project.godot" | head -n 1)
           
@@ -41,6 +41,7 @@ jobs:
           ABS_BUILD_DIR="$(pwd)/build"
           mkdir -p "$ABS_BUILD_DIR"
 
+          # إعداد التصدير ليخرج بصيغة APK
           echo "[preset.0]" > "$PROJECT_DIR/export_presets.cfg"
           echo 'name="Android"' >> "$PROJECT_DIR/export_presets.cfg"
           echo 'platform="Android"' >> "$PROJECT_DIR/export_presets.cfg"
@@ -49,10 +50,9 @@ jobs:
           echo 'export_filter="all_resources"' >> "$PROJECT_DIR/export_presets.cfg"
           echo 'include_filter=""' >> "$PROJECT_DIR/export_presets.cfg"
           echo 'exclude_filter="res://addons/AdmobPlugin/*,res://gdscript/sample/*"' >> "$PROJECT_DIR/export_presets.cfg"
-          echo 'export_path="game.pck"' >> "$PROJECT_DIR/export_presets.cfg"
+          echo 'export_path="game.apk"' >> "$PROJECT_DIR/export_presets.cfg"
           echo 'encryption_include_filters=""' >> "$PROJECT_DIR/export_presets.cfg"
-          echo 'encryption_exclude_filters=""' >> "$PROJECT_DIR/export_presets.cfg"
-          echo 'encrypt_pck=false' >> "$PROJECT_DIR/export_presets.cfg"
+          echo 'encryption_exclude_filters=""' >> "$PROJECT_DIR/encrypt_pck=false' >> "$PROJECT_DIR/export_presets.cfg"
           echo 'encrypt_directory=false' >> "$PROJECT_DIR/export_presets.cfg"
           echo "" >> "$PROJECT_DIR/export_presets.cfg"
           echo "[preset.0.options]" >> "$PROJECT_DIR/export_presets.cfg"
@@ -60,10 +60,12 @@ jobs:
           echo 'custom_template/release=""' >> "$PROJECT_DIR/export_presets.cfg"
 
           chmod -R 777 .
-          ./godot --path "$PROJECT_DIR" --headless --export-pack "Android" "$ABS_BUILD_DIR/game.pck"
+          
+          # استخدام --export-debug لتوليد ملف APK قابل للتثبيت مباشرة
+          ./godot --path "$PROJECT_DIR" --headless --export-debug "Android" "$ABS_BUILD_DIR/game.apk"
 
-      - name: Upload Artifact
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: game-pck
-          path: build/game.pck
+          name: game-apk
+          path: build/game.apk
