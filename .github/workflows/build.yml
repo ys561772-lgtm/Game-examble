@@ -17,29 +17,35 @@ jobs:
           mkdir -p ~/.local/share/godot/export_templates/4.3.stable
           unzip Godot_v4.3-stable_export_templates.tpz -d ~/.local/share/godot/export_templates/4.3.stable/
 
-      - name: Create Clean Export Preset
+      - name: Check Files & Create Preset
         run: |
           mkdir -p .godot/editor
           mkdir -p build
           chmod -R 777 .
+          
+          # استعراض الملفات للتأكد من وجود مشروع حقيقي
+          echo "Listing project files:"
+          ls -la
 
-          echo "[preset.0]" > export_presets.cfg
-          echo 'name="Android"' >> export_presets.cfg
-          echo 'platform="Android"' >> export_presets.cfg
-          echo 'runnable=true' >> export_presets.cfg
-          echo 'custom_features=""' >> export_presets.cfg
-          echo 'export_filter="all_resources"' >> export_presets.cfg
-          echo 'include_filter=""' >> export_presets.cfg
-          echo 'exclude_filter=""' >> export_presets.cfg
-          echo 'export_path="build/game.pck"' >> export_presets.cfg
-          echo 'encryption_include_filters=""' >> export_presets.cfg
-          echo 'encryption_exclude_filters=""' >> export_presets.cfg
-          echo 'encrypt_pck=false' >> export_presets.cfg
-          echo 'encrypt_directory=false' >> export_presets.cfg
-          echo "" >> export_presets.cfg
-          echo "[preset.0.options]" >> export_presets.cfg
-          echo 'custom_template/debug=""' >> export_presets.cfg
-          echo 'custom_template/release=""' >> export_presets.cfg
+          cat << 'EOF' > export_presets.cfg
+[preset.0]
+name="Android"
+platform="Android"
+runnable=true
+custom_features=""
+export_filter="all_resources"
+include_filter=""
+exclude_filter=""
+export_path="build/game.pck"
+encryption_include_filters=""
+encryption_exclude_filters=""
+encrypt_pck=false
+encrypt_directory=false
+
+[preset.0.options]
+custom_template/debug=""
+custom_template/release=""
+EOF
 
       - name: Export Game
         run: |
