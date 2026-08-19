@@ -17,14 +17,15 @@ jobs:
           mkdir -p ~/.local/share/godot/export_templates/4.3.stable
           unzip Godot_v4.3-stable_export_templates.tpz -d ~/.local/share/godot/export_templates/4.3.stable/
 
-      - name: Setup Workspace and Presets
+      - name: Create Clean Export Preset
         run: |
-          # إنشاء مجلدات النظام والصلاحيات مسبقاً لمنع خطأ الكتابة
           mkdir -p .godot/editor
+          mkdir -p build
           chmod -R 777 .
 
-          # إنشاء ملف إعدادات التصدير بصيغة صحيحة 100%
-          echo '[preset.0]
+          # استخدام cat لتوليد ملف إعدادات سليم 100% بدون أخطاء مسافات
+          cat << 'EOF' > export_presets.cfg
+          [preset.0]
           name="Android"
           platform="Android"
           runnable=true
@@ -38,12 +39,13 @@ jobs:
           encrypt_pck=false
           encrypt_directory=false
 
-          [preset.0.options]' > export_presets.cfg
+          [preset.0.options]
+          custom_template/debug=""
+          custom_template/release=""
+          EOF
 
       - name: Export Game
         run: |
-          mkdir -p build
-          # إضافة --path . لتوجيه المحرك للمشروع مباشرة
           ./godot --path . --headless --export-pack "Android" build/game.pck
 
       - name: Upload Artifact
