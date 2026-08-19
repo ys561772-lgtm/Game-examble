@@ -7,20 +7,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      # هذه الخطوة تنشئ إعدادات تصدير افتراضية إذا لم يجد السيرفر ملفك
-      - name: Create export_presets.cfg
-        run: |
-          echo '[preset.0]
-          name="Android"
-          platform="Android"
-          export_path="game.apk"' > export_presets.cfg
-
-      - name: Godot Export
+      - name: Build
         uses: firebelley/godot-export@v6.0.0
         with:
-          godot_executable_download_url: https://downloads.tuxfamily.org/godotengine/4.2.1/Godot_v4.2.1-stable_linux.x86_64.zip
-          godot_export_templates_download_url: https://downloads.tuxfamily.org/godotengine/4.2.1/Godot_v4.2.1-stable_export_templates.tpz
-      
+          # روابط مخصصة لنسخة 4.7-stable
+          godot_executable_download_url: https://github.com/godotengine/godot/releases/download/4.7-stable/Godot_v4.7-stable_linux.x86_64.zip
+          godot_export_templates_download_url: https://github.com/godotengine/godot/releases/download/4.7-stable/Godot_v4.7-stable_export_templates.tpz
+          create_custom_export_presets: true
+          android: true
+
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
