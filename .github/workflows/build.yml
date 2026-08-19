@@ -41,7 +41,6 @@ jobs:
           ABS_BUILD_DIR="$(pwd)/build"
           mkdir -p "$ABS_BUILD_DIR"
 
-          # إعداد التصدير ليخرج بصيغة APK
           echo "[preset.0]" > "$PROJECT_DIR/export_presets.cfg"
           echo 'name="Android"' >> "$PROJECT_DIR/export_presets.cfg"
           echo 'platform="Android"' >> "$PROJECT_DIR/export_presets.cfg"
@@ -52,7 +51,8 @@ jobs:
           echo 'exclude_filter="res://addons/AdmobPlugin/*,res://gdscript/sample/*"' >> "$PROJECT_DIR/export_presets.cfg"
           echo 'export_path="game.apk"' >> "$PROJECT_DIR/export_presets.cfg"
           echo 'encryption_include_filters=""' >> "$PROJECT_DIR/export_presets.cfg"
-          echo 'encryption_exclude_filters=""' >> "$PROJECT_DIR/encrypt_pck=false' >> "$PROJECT_DIR/export_presets.cfg"
+          echo 'encryption_exclude_filters=""' >> "$PROJECT_DIR/export_presets.cfg"
+          echo 'encrypt_pck=false' >> "$PROJECT_DIR/export_presets.cfg"
           echo 'encrypt_directory=false' >> "$PROJECT_DIR/export_presets.cfg"
           echo "" >> "$PROJECT_DIR/export_presets.cfg"
           echo "[preset.0.options]" >> "$PROJECT_DIR/export_presets.cfg"
@@ -60,8 +60,6 @@ jobs:
           echo 'custom_template/release=""' >> "$PROJECT_DIR/export_presets.cfg"
 
           chmod -R 777 .
-          
-          # استخدام --export-debug لتوليد ملف APK قابل للتثبيت مباشرة
           ./godot --path "$PROJECT_DIR" --headless --export-debug "Android" "$ABS_BUILD_DIR/game.apk"
 
       - name: Upload APK Artifact
