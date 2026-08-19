@@ -9,41 +9,51 @@ jobs:
 
       - name: Download Godot Quick
         run: |
-          echo "Downloading Godot engine..."
           curl -L -o godot.zip https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip
           unzip -q godot.zip
           mv Godot_v4.3-stable_linux.x86_64 godot
 
-          echo "Downloading templates..."
           curl -L -o templates.tpz https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_export_templates.tpz
           mkdir -p ~/.local/share/godot/export_templates/4.3.stable
           unzip -q templates.tpz -d ~/.local/share/godot/export_templates/4.3.stable/
 
-      - name: Create Preset & Export
+      - name: Find Project and Export
         run: |
-          mkdir -p .godot/editor
+          PROJECT_FILE=$(find . -name "project.godot" | head -n 1)
+          
+          if [ -z "$PROJECT_FILE" ]; then
+            echo "خطأ: لم يتم العثور على ملف project.godot في المستودع!"
+            exit 1
+          fi
+
+          PROJECT_DIR=$(dirname "$PROJECT_FILE")
+          echo "تم العثور على المشروع في المجلد: $PROJECT_DIR"
+
+          mkdir -p "$PROJECT_DIR/.godot/editor"
           mkdir -p build
+
+          cat << 'EOF' > "$PROJECT_DIR/export_presets.cfg"
+[preset.0]
+name="Android"
+platform="Android"
+runnable=true
+custom_features=""
+export_filter="all_resources"
+include_filter=""
+exclude_filter=""
+export_path="../build/game.pck"
+encryption_include_filters=""
+encryption_exclude_filters=""
+encrypt_pck=false
+encrypt_directory=false
+
+[preset.0.options]
+custom_template/debug=""
+custom_template/release=""
+EOF
+
           chmod -R 777 .
-
-          echo "[preset.0]" > export_presets.cfg
-          echo 'name="Android"' >> export_presets.cfg
-          echo 'platform="Android"' >> export_presets.cfg
-          echo 'runnable=true' >> export_presets.cfg
-          echo 'custom_features=""' >> export_presets.cfg
-          echo 'export_filter="all_resources"' >> export_presets.cfg
-          echo 'include_filter=""' >> export_presets.cfg
-          echo 'exclude_filter=""' >> export_presets.cfg
-          echo 'export_path="build/game.pck"' >> export_presets.cfg
-          echo 'encryption_include_filters=""' >> export_presets.cfg
-          echo 'encryption_exclude_filters=""' >> export_presets.cfg
-          echo 'encrypt_pck=false' >> export_presets.cfg
-          echo 'encrypt_directory=false' >> export_presets.cfg
-          echo "" >> export_presets.cfg
-          echo "[preset.0.options]" >> export_presets.cfg
-          echo 'custom_template/debug=""' >> export_presets.cfg
-          echo 'custom_template/release=""' >> export_presets.cfg
-
-          ./godot --path . --headless --export-pack "Android" build/game.pck
+          ./godot --path "$PROJECT_DIR" --headless --export-pack "Android" build/game.pck
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
