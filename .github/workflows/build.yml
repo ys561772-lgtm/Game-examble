@@ -7,8 +7,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download Godot Quick
+      - name: Extract Project ZIP & Download Godot
         run: |
+          # فك ضغط ملف الـ ZIP الخاص باللعبة إذا كان موجوداً كملف مضغوط
+          if ls *.zip 1> /dev/null 2>&1; then
+            echo "تم العثور على ملف ZIP، جاري فك الضغط..."
+            # استثناء ملفات جودوت المؤقتة إذا تم تحميلها مسبقاً
+            for f in *.zip; do
+              if [[ "$f" != "godot.zip" ]]; then
+                unzip -q "$f" -d extracted_game
+              fi
+            done
+          fi
+
           curl -L -o godot.zip https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip
           unzip -q godot.zip
           mv Godot_v4.3-stable_linux.x86_64 godot
@@ -22,7 +33,7 @@ jobs:
           PROJECT_FILE=$(find . -name "project.godot" | head -n 1)
           
           if [ -z "$PROJECT_FILE" ]; then
-            echo "خطأ: لم يتم العثور على ملف project.godot في المستودع!"
+            echo "خطأ: لم يتم العثور على ملف project.godot حتى بعد فك الـ ZIP!"
             exit 1
           fi
 
