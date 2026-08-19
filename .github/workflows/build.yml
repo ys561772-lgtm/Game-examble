@@ -7,17 +7,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Build
+      - name: Godot Export
         uses: firebelley/godot-export@v6.0.0
         with:
-          # روابط مخصصة لنسخة 4.7-stable
-          godot_executable_download_url: https://github.com/godotengine/godot/releases/download/4.7-stable/Godot_v4.7-stable_linux.x86_64.zip
-          godot_export_templates_download_url: https://github.com/godotengine/godot/releases/download/4.7-stable/Godot_v4.7-stable_export_templates.tpz
-          create_custom_export_presets: true
-          android: true
+          godot_executable_download_url: https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip
+          godot_export_templates_download_url: https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_export_templates.tpz
+          archive_output: true
 
-      - name: Upload
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: game-apk
-          path: ./**/*.apk
+          path: ./**/*.zip
