@@ -9,10 +9,7 @@ jobs:
 
       - name: Extract Project ZIP & Download Godot
         run: |
-          # فك ضغط ملف الـ ZIP الخاص باللعبة إذا كان موجوداً كملف مضغوط
           if ls *.zip 1> /dev/null 2>&1; then
-            echo "تم العثور على ملف ZIP، جاري فك الضغط..."
-            # استثناء ملفات جودوت المؤقتة إذا تم تحميلها مسبقاً
             for f in *.zip; do
               if [[ "$f" != "godot.zip" ]]; then
                 unzip -q "$f" -d extracted_game
@@ -33,7 +30,7 @@ jobs:
           PROJECT_FILE=$(find . -name "project.godot" | head -n 1)
           
           if [ -z "$PROJECT_FILE" ]; then
-            echo "خطأ: لم يتم العثور على ملف project.godot حتى بعد فك الـ ZIP!"
+            echo "خطأ: لم يتم العثور على ملف project.godot!"
             exit 1
           fi
 
@@ -41,28 +38,34 @@ jobs:
           echo "تم العثور على المشروع في المجلد: $PROJECT_DIR"
 
           mkdir -p "$PROJECT_DIR/.godot/editor"
-          mkdir -p build
+          ABS_BUILD_DIR="$(pwd)/build"
+          mkdir -p "$ABS_BUILD_DIR"
 
-          echo "[preset.0]" > "$PROJECT_DIR/export_presets.cfg"
-          echo 'name="Android"' >> "$PROJECT_DIR/export_presets.cfg"
-          echo 'platform="Android"' >> "$PROJECT_DIR/export_presets.cfg"
-          echo 'runnable=true' >> "$PROJECT_DIR/export_presets.cfg"
-          echo 'custom_features=""' >> "$PROJECT_DIR/export_presets.cfg"
-          echo 'export_filter="all_resources"' >> "$PROJECT_DIR/export_presets.cfg"
-          echo 'include_filter=""' >> "$PROJECT_DIR/export_presets.cfg"
-          echo 'exclude_filter=""' >> "$PROJECT_DIR/export_presets.cfg"
-          echo 'export_path="../build/game.pck"' >> "$PROJECT_DIR/export_presets.cfg"
-          echo 'encryption_include_filters=""' >> "$PROJECT_DIR/export_presets.cfg"
-          echo 'encryption_exclude_filters=""' >> "$PROJECT_DIR/export_presets.cfg"
-          echo 'encrypt_pck=false' >> "$PROJECT_DIR/export_presets.cfg"
-          echo 'encrypt_directory=false' >> "$PROJECT_DIR/export_presets.cfg"
-          echo "" >> "$PROJECT_DIR/export_presets.cfg"
-          echo "[preset.0.options]" >> "$PROJECT_DIR/export_presets.cfg"
-          echo 'custom_template/debug=""' >> "$PROJECT_DIR/export_presets.cfg"
-          echo 'custom_template/release=""' >> "$PROJECT_DIR/export_presets.cfg"
+          # كتابة إعدادات التصدير مع استثناء مجلدات الأخطاء (مثل Admob والـ samples) لتجنب توقف المحرك
+          cat << 'EOF' > "$PROJECT_DIR/export_presets.cfg"
+[preset.0]
+name="Android"
+platform="Android"
+runnable=true
+custom_features=""
+export_filter="all_resources"
+include_filter=""
+exclude_filter="res://addons/AdmobPlugin/*,res://gdscript/sample/*"
+export_path="game.pck"
+encryption_include_filters=""
+encryption_exclude_filters=""
+encrypt_pck=false
+encrypt_directory=false
+
+[preset.0.options]
+custom_template/debug=""
+custom_template/release=""
+EOF
 
           chmod -R 777 .
-          ./godot --path "$PROJECT_DIR" --headless --export-pack "Android" build/game.pck
+          
+          # تشغيل التصدير بشكل نظيف
+          ./godot --path "$PROJECT_DIR" --headless --export-pack "Android" "$ABS_BUILD_DIR/game.pck"
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
