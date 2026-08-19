@@ -21,9 +21,15 @@ jobs:
           unzip -q godot.zip
           mv Godot_v4.3-stable_linux.x86_64 godot
 
+          # تحميل وفك قوالب التصدير بطريقة صحيحة تضمن عدم ضياع أي ملف
           curl -L -o templates.tpz https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_export_templates.tpz
+          mkdir -p temp_templates
+          unzip -q templates.tpz -d temp_templates
+          
+          # إنشاء مجلد القوالب النهائي ونقل الملفات بداخله مباشرة
           mkdir -p ~/.local/share/godot/export_templates/4.3.stable
-          unzip -q templates.tpz -d ~/.local/share/godot/export_templates/4.3.stable/
+          find temp_templates -type f -exec mv {} ~/.local/share/godot/export_templates/4.3.stable/ \;
+          rm -rf temp_templates
 
       - name: Find Project and Export APK
         run: |
@@ -50,8 +56,7 @@ jobs:
           echo 'include_filter=""' >> "$PROJECT_DIR/export_presets.cfg"
           echo 'exclude_filter="res://addons/AdmobPlugin/*,res://gdscript/sample/*"' >> "$PROJECT_DIR/export_presets.cfg"
           echo 'export_path="game.apk"' >> "$PROJECT_DIR/export_presets.cfg"
-          echo 'encryption_include_filters=""' >> "$PROJECT_DIR/export_presets.cfg"
-          echo 'encryption_exclude_filters=""' >> "$PROJECT_DIR/export_presets.cfg"
+          echo 'encryption_include_filters=""' >> "$PROJECT_DIR/encryption_exclude_filters=""' >> "$PROJECT_DIR/export_presets.cfg"
           echo 'encrypt_pck=false' >> "$PROJECT_DIR/export_presets.cfg"
           echo 'encrypt_directory=false' >> "$PROJECT_DIR/export_presets.cfg"
           echo "" >> "$PROJECT_DIR/export_presets.cfg"
