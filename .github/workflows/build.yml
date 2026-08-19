@@ -17,6 +17,19 @@ jobs:
           mkdir -p ~/.local/share/godot/export_templates/4.3.stable
           unzip Godot_v4.3-stable_export_templates.tpz -d ~/.local/share/godot/export_templates/4.3.stable/
 
+      - name: Create Export Preset & Fix Permissions
+        run: |
+          # إنشاء ملف إعدادات تصدير بسيط يحل مشكلة "Must select at least one file"
+          echo '[preset.0]
+          name="Android"
+          platform="Android"
+          runnable=true
+          export_filter="all_resources"
+          export_path="game.pck"' > export_presets.cfg
+
+          # منح الصلاحيات الكاملة لمجلد المشروع لتجنب أخطاء الحفظ
+          chmod -R 777 .
+
       - name: Export Game
         run: |
           mkdir -p build
